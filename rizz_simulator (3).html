@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIZZ SIMULATOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0a0f;
+    --surface:   #13131a;
+    --surface2:  #1c1c28;
+    --border:    #2a2a3d;
+    --accent:    #e91e8c;
+    --accent2:   #7c3aed;
+    --accent3:   #f0a500;
+    --text:      #f0eeff;
+    --text-dim:  #8888aa;
+    --aziz:      #5B9BD5;
+    --zafar:     #D94F4F;
+    --hasan:     #9B59B6;
+    --islom:     #F0A500;
+    --easy:      #22c55e;
+    --medium:    #f0a500;
+    --hard:      #ef4444;
+    --impossible:#a855f7;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ══════════════════════════════════════════
+     SCREENS
+  ══════════════════════════════════════════ */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ══════════════════════════════════════════
+     TITLE SCREEN
+  ══════════════════════════════════════════ */
+  #screen-title {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .title-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 50%, rgba(233,30,140,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 30%, rgba(124,58,237,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 50% 100%, rgba(240,165,0,0.08) 0%, transparent 60%);
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes bgPulse {
+    0%   { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  .title-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(233,30,140,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(233,30,140,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .title-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .title-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-transform: uppercase;
+    animation: fadeInDown 0.8s ease both;
+  }
+
+  .title-main {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 15vw, 10rem);
+    line-height: 0.9;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s ease 0.2s both;
+    filter: drop-shadow(0 0 40px rgba(233,30,140,0.3));
+  }
+
+  .title-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    animation: fadeInUp 0.8s ease 0.4s both;
+  }
+
+  .title-hearts {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    animation: fadeInUp 0.8s ease 0.5s both;
+  }
+
+  .title-hearts span {
+    animation: heartBeat 2s ease-in-out infinite;
+  }
+  .title-hearts span:nth-child(2) { animation-delay: 0.3s; }
+  .title-hearts span:nth-child(3) { animation-delay: 0.6s; }
+
+  @keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  .btn-start {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+    padding: 1rem 3rem;
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+    animation: fadeInUp 0.8s ease 0.7s both;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+
+  .btn-start::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .btn-start:hover::before { transform: translateX(0); }
+  .btn-start:hover { color: white; }
+
+  .btn-start span { position: relative; z-index: 1; }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════════════════
+     CHARACTER CREATION SCREEN
+  ══════════════════════════════════════════ */
+  #screen-create {
+    padding: 2rem;
+    align-items: center;
+    background: var(--bg);
+  }
+
+  .create-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    width: 100%;
+  }
+
+  .create-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .create-header p {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .create-panel {
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .create-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+  }
+
+  .create-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .create-section h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .name-input-wrap {
+    grid-column: 1 / -1;
+  }
+
+  .name-input-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-style: italic;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    text-align: center;
+  }
+
+  .name-input-wrap input:focus {
+    border-color: var(--accent);
+  }
+
+  .name-input-wrap input::placeholder {
+    color: var(--text-dim);
+    font-size: 1rem;
+  }
+
+  /* Trait sliders */
+  .trait-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .trait-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    width: 130px;
+    flex-shrink: 0;
+    line-height: 1.3;
+  }
+
+  .trait-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--border);
+    outline: none;
+    border-radius: 0;
+    cursor: pointer;
+  }
+
+  .trait-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent);
+    cursor: pointer;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    transition: transform 0.2s;
+  }
+
+  .trait-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.4);
+  }
+
+  .trait-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    width: 20px;
+    text-align: center;
+  }
+
+  .btn-create {
+    grid-column: 1 / -1;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+    clip-path: polygon(16px 0%, 100% 0%, calc(100% - 16px) 100%, 0% 100%);
+  }
+
+  .btn-create:hover {
+    opacity: 0.9;
+    transform: scale(1.01);
+  }
+
+  /* ══════════════════════════════════════════
+     BOY SELECT SCREEN
+  ══════════════════════════════════════════ */
+  #screen-select {
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .select-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .select-header h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 0.1em;
+    color: var(--text);
+  }
+
+  .select-header .player-name-display {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-size: 1.1rem;
+    margin-top: 0.3rem;
+  }
+
+  .boys-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .boy-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .boy-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .boy-card[data-boy="aziz"]::before  { background: radial-gradient(circle at 50% 0%, rgba(91,155,213,0.15), transparent 70%); }
+  .boy-card[data-boy="zafar"]::before { background: radial-gradient(circle at 50% 0%, rgba(217,79,79,0.15), transparent 70%); }
+  .boy-card[data-boy="hasan"]::before { background: radial-gradient(circle at 50% 0%, rgba(155,89,182,0.15), transparent 70%); }
+  .boy-card[data-boy="islom"]::before { background: radial-gradient(circle at 50% 0%, rgba(240,165,0,0.15), transparent 70%); }
+
+  .boy-card:hover { transform: translateY(-6px); }
+  .boy-card:hover::before { opacity: 1; }
+  .boy-card[data-boy="aziz"]:hover  { border-color: var(--aziz);  box-shadow: 0 8px 30px rgba(91,155,213,0.2); }
+  .boy-card[data-boy="zafar"]:hover { border-color: var(--zafar); box-shadow: 0 8px 30px rgba(217,79,79,0.2); }
+  .boy-card[data-boy="hasan"]:hover { border-color: var(--hasan); box-shadow: 0 8px 30px rgba(155,89,182,0.2); }
+  .boy-card[data-boy="islom"]:hover { border-color: var(--islom); box-shadow: 0 8px 30px rgba(240,165,0,0.2); }
+
+  .boy-sprite-placeholder {
+    width: 100px;
+    height: 140px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+  }
+
+  .boy-sprite-placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: bottom;
+  }
+
+  .boy-sprite-placeholder .sprite-fallback {
+    font-size: 5rem;
+    line-height: 1;
+  }
+
+  .boy-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .boy-card[data-boy="aziz"]  .boy-name { color: var(--aziz); }
+  .boy-card[data-boy="zafar"] .boy-name { color: var(--zafar); }
+  .boy-card[data-boy="hasan"] .boy-name { color: var(--hasan); }
+  .boy-card[data-boy="islom"] .boy-name { color: var(--islom); }
+
+  .boy-fidelity {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+    padding: 0.2rem 0.5rem;
+    display: inline-block;
+  }
+
+  .fidelity-bar {
+    margin-top: 0.8rem;
+    height: 3px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .fidelity-fill {
+    height: 100%;
+    transition: width 0.6s ease;
+  }
+
+  .boy-card[data-boy="aziz"]  .fidelity-fill { background: var(--aziz); }
+  .boy-card[data-boy="zafar"] .fidelity-fill { background: var(--zafar); }
+  .boy-card[data-boy="hasan"] .fidelity-fill { background: var(--hasan); }
+  .boy-card[data-boy="islom"] .fidelity-fill { background: var(--islom); }
+
+  .fidelity-label {
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ══════════════════════════════════════════
+     GAME SCREEN
+  ══════════════════════════════════════════ */
+  #screen-game {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Left panel — sprite */
+  .game-left {
+    width: 42%;
+    background: var(--surface);
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+
+  .game-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, rgba(233,30,140,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .game-sprite-wrap {
+    position: relative;
+    z-index: 2;
+    height: 92%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    transition: all 0.4s ease;
+  }
+
+  .game-sprite-wrap img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom;
+    filter: drop-shadow(0 0 30px rgba(0,0,0,0.5));
+    transition: all 0.3s ease;
+  }
+
+  .sprite-emoji-fallback {
+    font-size: 12rem;
+    line-height: 1;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+  }
+
+  /* Rizz bar top */
+  .rizz-bar-container {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    z-index: 5;
+  }
+
+  .rizz-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+  }
+
+  .rizz-score-num {
+    color: var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+  }
+
+  .rizz-bar-track {
+    height: 6px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rizz-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+
+  .rizz-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: rgba(255,255,255,0.3);
+    filter: blur(4px);
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+
+  /* Emotion state badge */
+  .emotion-badge {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    z-index: 5;
+  }
+
+  /* Right panel — dialogue */
+  .game-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .game-top-bar {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+
+  .boy-name-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+  }
+
+  .chapter-badge {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .back-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Dialogue box */
+  .dialogue-area {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  .dialogue-bubble {
+    max-width: 90%;
+    animation: bubbleIn 0.3s ease both;
+  }
+
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .dialogue-bubble.boy {
+    align-self: flex-start;
+  }
+
+  .dialogue-bubble.player {
+    align-self: flex-end;
+  }
+
+  .bubble-speaker {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    color: var(--text-dim);
+  }
+
+  .bubble-text {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 1.65;
+    position: relative;
+  }
+
+  .dialogue-bubble.boy .bubble-text {
+    border-left: 3px solid currentColor;
+  }
+
+  .dialogue-bubble.player .bubble-text {
+    background: var(--surface2);
+    border-right: 3px solid var(--accent);
+    text-align: right;
+  }
+
+  /* Narrative text */
+  .narrative-text {
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-dim);
+    text-align: center;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    animation: bubbleIn 0.3s ease both;
+    line-height: 1.7;
+  }
+
+  /* Choices */
+  .choices-area {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+
+  .choice-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+  }
+
+  .choice-btn::before {
+    content: '▶';
+    position: absolute;
+    left: -1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 0.6rem;
+    transition: left 0.2s;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    padding-left: 1.5rem;
+  }
+
+  .choice-btn:hover::before {
+    left: 0.5rem;
+  }
+
+  .choice-rizz-hint {
+    float: right;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    margin-left: 0.5rem;
+  }
+
+  /* ══════════════════════════════════════════
+     ENDING SCREEN
+  ══════════════════════════════════════════ */
+  #screen-ending {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ending-bg {
+    position: absolute;
+    inset: 0;
+    animation: bgPulse 4s ease-in-out infinite alternate;
+  }
+
+  .ending-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    padding: 2rem;
+  }
+
+  .ending-emoji { font-size: 5rem; margin-bottom: 1rem; display: block; }
+
+  .ending-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .ending-score {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+  }
+
+  .ending-msg {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .btn-restart {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.2em;
+    padding: 0.8rem 2.5rem;
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.3s;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+
+  .btn-restart:hover {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* ══════════════════════════════════════════
+     RIZZ FEEDBACK TOAST
+  ══════════════════════════════════════════ */
+  .toast {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    z-index: 10000;
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-left: 3px solid var(--accent);
+    max-width: 250px;
+  }
+
+  .toast.show { transform: translateX(0); }
+  .toast.positive { border-left-color: #22c55e; }
+  .toast.negative { border-left-color: #ef4444; }
+
+  /* ══════════════════════════════════════════
+     SCROLLBAR
+  ══════════════════════════════════════════ */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .create-panel { grid-template-columns: 1fr; }
+    .boys-grid { grid-template-columns: 1fr 1fr; }
+    #screen-game { flex-direction: column; }
+    .game-left { width: 100%; height: 35vh; border-right: none; border-bottom: 1px solid var(--border); }
+    .game-sprite-wrap { height: 95%; }
+    .sprite-emoji-fallback { font-size: 7rem; }
+    .name-input-wrap { grid-column: 1; }
+    .btn-create { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     TITLE SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-title" class="screen active">
+  <div class="title-bg"></div>
+  <div class="title-grid"></div>
+  <div class="title-content">
+    <div class="title-eyebrow">A Comedy Dating Simulator</div>
+    <div class="title-main">RIZZ<br>SIMULATOR</div>
+    <div class="title-sub">Four boys. One girl. Infinite degeneracy.</div>
+    <div class="title-hearts">
+      <span>💘</span><span>💗</span><span>💘</span>
+    </div>
+    <button class="btn-start" onclick="showScreen('screen-create')">
+      <span>START GAME</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CHARACTER CREATION SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-create" class="screen">
+  <div class="create-header">
+    <h2>CREATE YOUR GIRL</h2>
+    <p>Set your traits from 1–10. High fidelity with a boy = easier to rizz him up.</p>
+  </div>
+
+  <div class="create-panel">
+
+    <!-- Name -->
+    <div class="create-section name-input-wrap">
+      <h3>✦ Your Name</h3>
+      <input type="text" id="player-name-input" placeholder="Enter your character's name..." maxlength="20">
+    </div>
+
+    <!-- Physical Traits -->
+    <div class="create-section">
+      <h3>✦ Physical Traits</h3>
+
+      <div class="trait-row">
+        <span class="trait-label">Boob Size</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_boobs" oninput="updateVal(this)">
+        <span class="trait-val" id="v_boobs">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Cheek Fullness</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_cheeks" oninput="updateVal(this)">
+        <span class="trait-val" id="v_cheeks">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Body Score</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_body" oninput="updateVal(this)">
+        <span class="trait-val" id="v_body">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Femininity</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_feminine" oninput="updateVal(this)">
+        <span class="trait-val" id="v_feminine">5</span>
+      </div>
+    </div>
+
+    <!-- Personality Traits -->
+    <div class="create-section">
+      <h3>✦ Personality Traits</h3>
+
+      <div class="trait-row">
+        <span class="trait-label">Anime Lover</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_anime" oninput="updateVal(this)">
+        <span class="trait-val" id="v_anime">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Movie Lover</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_movies" oninput="updateVal(this)">
+        <span class="trait-val" id="v_movies">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Book Lover</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_books" oninput="updateVal(this)">
+        <span class="trait-val" id="v_books">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Gamer</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_gamer" oninput="updateVal(this)">
+        <span class="trait-val" id="v_gamer">5</span>
+      </div>
+    </div>
+
+    <!-- Social Traits -->
+    <div class="create-section">
+      <h3>✦ Social Traits</h3>
+
+      <div class="trait-row">
+        <span class="trait-label">Social Media</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_social" oninput="updateVal(this)">
+        <span class="trait-val" id="v_social">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Sports Fan</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_sports" oninput="updateVal(this)">
+        <span class="trait-val" id="v_sports">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Volleyball Fan</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_volleyball" oninput="updateVal(this)">
+        <span class="trait-val" id="v_volleyball">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Boldness</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_bold" oninput="updateVal(this)">
+        <span class="trait-val" id="v_bold">5</span>
+      </div>
+    </div>
+
+    <!-- Vibe Traits -->
+    <div class="create-section">
+      <h3>✦ Vibe Traits</h3>
+
+      <div class="trait-row">
+        <span class="trait-label">Intelligence</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_intel" oninput="updateVal(this)">
+        <span class="trait-val" id="v_intel">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Charisma</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_charm" oninput="updateVal(this)">
+        <span class="trait-val" id="v_charm">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Sigma Energy</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_sigma" oninput="updateVal(this)">
+        <span class="trait-val" id="v_sigma">5</span>
+      </div>
+      <div class="trait-row">
+        <span class="trait-label">Delulu Level</span>
+        <input type="range" class="trait-slider" min="1" max="10" value="5" id="t_delulu" oninput="updateVal(this)">
+        <span class="trait-val" id="v_delulu">5</span>
+      </div>
+    </div>
+
+    <button class="btn-create" onclick="createCharacter()">✦ LOCK IN YOUR GIRL ✦</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     BOY SELECT SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-select" class="screen">
+  <div class="select-header">
+    <h2>CHOOSE YOUR TARGET</h2>
+    <div class="player-name-display" id="select-player-name"></div>
+    <div style="font-size:0.7rem;color:var(--text-dim);margin-top:0.5rem;letter-spacing:0.1em;">FIDELITY % = YOUR COMPATIBILITY WITH THIS BOY</div>
+  </div>
+
+  <div class="boys-grid">
+    <!-- Aziz -->
+    <div class="boy-card" data-boy="aziz" onclick="startRoute('aziz')">
+      <div class="boy-sprite-placeholder">
+        <img src="aziz_listening.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Aziz">
+        <div class="sprite-fallback" style="display:none">🧍</div>
+      </div>
+      <div class="boy-name">AZIZ</div>
+      <div class="boy-fidelity" id="fidelity-label-aziz" style="color:var(--aziz)">— %</div>
+      <div class="fidelity-bar"><div class="fidelity-fill" id="fidelity-bar-aziz" style="width:0%"></div></div>
+      <div class="fidelity-label">FIDELITY</div>
+    </div>
+
+    <!-- Zafar -->
+    <div class="boy-card" data-boy="zafar" onclick="startRoute('zafar')">
+      <div class="boy-sprite-placeholder">
+        <img src="zafar_listening.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Zafar">
+        <div class="sprite-fallback" style="display:none">🧍</div>
+      </div>
+      <div class="boy-name">ZAFAR</div>
+      <div class="boy-fidelity" id="fidelity-label-zafar" style="color:var(--zafar)">— %</div>
+      <div class="fidelity-bar"><div class="fidelity-fill" id="fidelity-bar-zafar" style="width:0%"></div></div>
+      <div class="fidelity-label">FIDELITY</div>
+    </div>
+
+    <!-- Hasan -->
+    <div class="boy-card" data-boy="hasan" onclick="startRoute('hasan')">
+      <div class="boy-sprite-placeholder">
+        <img src="hasan_listening.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Hasan">
+        <div class="sprite-fallback" style="display:none">🧍</div>
+      </div>
+      <div class="boy-name">HASAN</div>
+      <div class="boy-fidelity" id="fidelity-label-hasan" style="color:var(--hasan)">— %</div>
+      <div class="fidelity-bar"><div class="fidelity-fill" id="fidelity-bar-hasan" style="width:0%"></div></div>
+      <div class="fidelity-label">FIDELITY</div>
+    </div>
+
+    <!-- Islom -->
+    <div class="boy-card" data-boy="islom" onclick="startRoute('islom')">
+      <div class="boy-sprite-placeholder">
+        <img src="islom_listening.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Islom">
+        <div class="sprite-fallback" style="display:none">🧍</div>
+      </div>
+      <div class="boy-name">ISLOM</div>
+      <div class="boy-fidelity" id="fidelity-label-islom" style="color:var(--islom)">— %</div>
+      <div class="fidelity-bar"><div class="fidelity-fill" id="fidelity-bar-islom" style="width:0%"></div></div>
+      <div class="fidelity-label">FIDELITY</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     GAME SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <!-- Left: Sprite -->
+  <div class="game-left">
+    <div class="game-bg-overlay"></div>
+
+    <div class="rizz-bar-container">
+      <div class="rizz-bar-label">
+        <span>RIZZ METER</span>
+        <span class="rizz-score-num" id="rizz-score-display">0</span>
+      </div>
+      <div class="rizz-bar-track">
+        <div class="rizz-bar-fill" id="rizz-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="game-sprite-wrap" id="game-sprite-wrap">
+      <img id="game-sprite-img" src="" alt="" onerror="this.style.display='none';document.getElementById('game-sprite-emoji').style.display='block'">
+      <div class="sprite-emoji-fallback" id="game-sprite-emoji" style="display:none">🧍</div>
+    </div>
+
+    <div class="emotion-badge" id="emotion-badge">LISTENING</div>
+  </div>
+
+  <!-- Right: Dialogue -->
+  <div class="game-right">
+    <div class="game-top-bar">
+      <div>
+        <div class="boy-name-badge" id="game-boy-name">—</div>
+        <div class="chapter-badge" id="game-chapter-label">CHAPTER 1</div>
+      </div>
+      <button class="back-btn" onclick="showScreen('screen-select')">◀ BACK</button>
+    </div>
+
+    <div class="dialogue-area" id="dialogue-area"></div>
+
+    <div class="choices-area" id="choices-area"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ENDING SCREEN
+══════════════════════════════════════════ -->
+<div id="screen-ending" class="screen">
+  <div class="ending-bg" id="ending-bg"></div>
+  <div class="ending-content">
+    <span class="ending-emoji" id="ending-emoji">💔</span>
+    <div class="ending-title" id="ending-title">GAME OVER</div>
+    <div class="ending-score" id="ending-score">FINAL RIZZ: 0 / 100</div>
+    <div class="ending-msg" id="ending-msg">Better luck next time...</div>
+    <button class="btn-restart" onclick="showScreen('screen-select')">TRY AGAIN</button>
+    &nbsp;
+    <button class="btn-restart" style="border-color:var(--text-dim);color:var(--text-dim)" onclick="showScreen('screen-title')">MAIN MENU</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+//  RIZZ SIMULATOR — CORE ENGINE
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── BOY TRAIT DATABASES ──────────────────────────────────────────────────────
+const BOY_TRAITS = {
+  aziz: {
+    attracted_to_cheeks:      3,
+    likes_anime:              2,
+    corn_ball:                1,
+    cinephile:                7,
+    gamer:                    5,
+    addicted_to_social_media: 8,
+    sigma:                    8,
+    simp:                     1,
+    delulu:                   8,
+    not_woman_attracted:      4,
+    academical:               3,
+    likes_books:              7,
+    football_guy:            10,
+    volleyball_guy:           0,
+    feminine:                 3,
+    masculine:                6,
+    polite:                   7,
+    shy:                      9,
+    cares_about_personality:  5,
+    cares_about_body_most:    5,
+    likes_boobs:              8,
+    honest_non_manipulating:  6,
+  },
+  zafar: {
+    attracted_to_cheeks:      7,
+    likes_anime:              4,
+    corn_ball:                3,
+    cinephile:                7,
+    gamer:                    7,
+    addicted_to_social_media: 8,
+    sigma:                    5,
+    simp:                     2,
+    delulu:                   6,
+    not_woman_attracted:      5,
+    academical:               1,
+    likes_books:              2,
+    football_guy:            10,
+    volleyball_guy:           0,
+    feminine:                 2,
+    masculine:                6,
+    polite:                   2,
+    shy:                      3,
+    cares_about_personality:  0,
+    cares_about_body_most:   10,
+    likes_boobs:             10,
+    honest_non_manipulating:  0,
+  },
+  hasan: {
+    attracted_to_cheeks:      7,
+    likes_anime:              2,
+    corn_ball:                2,
+    cinephile:                7,
+    gamer:                    8,
+    addicted_to_social_media: 9,
+    sigma:                    7,
+    simp:                     2,
+    delulu:                   4,
+    not_woman_attracted:      3,
+    academical:               4,
+    likes_books:              0,
+    football_guy:             8,
+    volleyball_guy:           1,
+    feminine:                 5,
+    masculine:                6,
+    polite:                   5,
+    shy:                      4,
+    cares_about_personality:  5,
+    cares_about_body_most:   10,
+    likes_boobs:             10,
+    honest_non_manipulating:  5,
+  },
+  islom: {
+    attracted_to_cheeks:      9,
+    likes_anime:              3,
+    corn_ball:                4,
+    cinephile:                5,
+    gamer:                    6,
+    addicted_to_social_media: 7,
+    sigma:                    8,
+    simp:                     8,
+    delulu:                   9,
+    not_woman_attracted:      5,
+    academical:               5,
+    likes_books:              7,
+    football_guy:             8,
+    volleyball_guy:          10,
+    feminine:                 6,
+    masculine:                3,
+    polite:                   5,
+    shy:                      2,
+    cares_about_personality:  7,
+    cares_about_body_most:    6,
+    likes_boobs:              3,
+    honest_non_manipulating:  8,
+  }
+};
+
+const BOY_COLORS = { aziz:'#5B9BD5', zafar:'#D94F4F', hasan:'#9B59B6', islom:'#F0A500' };
+const BOY_NAMES  = { aziz:'Aziz', zafar:'Zafar', hasan:'Hasan', islom:'Islom' };
+
+// Win threshold: rizz needed to get the good ending
+const RIZZ_WIN_THRESHOLD = { aziz: 16, zafar: 14, hasan: 12, islom: 10 };
+const RIZZ_MAX           = { aziz: 22, zafar: 22, hasan: 22, islom: 22 };
+
+// ── PLAYER STATE ─────────────────────────────────────────────────────────────
+let player = {
+  name: 'Player',
+  traits: {
+    boobs:     5,
+    cheeks:    5,
+    body:      5,
+    feminine:  5,
+    anime:     5,
+    movies:    5,
+    books:     5,
+    gamer:     5,
+    social:    5,
+    sports:    5,
+    volleyball:5,
+    bold:      5,
+    intel:     5,
+    charm:     5,
+    sigma:     5,
+    delulu:    5,
+  }
+};
+
+// ── GAME STATE ────────────────────────────────────────────────────────────────
+let gameState = {
+  currentBoy:    null,
+  rizzScores:    { aziz:0, zafar:0, hasan:0, islom:0 },
+  fidelity:      { aziz:0, zafar:0, hasan:0, islom:0 },
+  currentScene:  0,
+  currentEmotion:'listening',
+  flags:         {},
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  FIDELITY CALCULATION
+//  Compares player traits to boy preferences. Higher match = higher fidelity.
+// ══════════════════════════════════════════════════════════════════════════════
+function calculateFidelity(boyId) {
+  const bt = BOY_TRAITS[boyId];
+  const pt = player.traits;
+  let score = 0;
+  let total = 0;
+
+  // Each pairing: [boyTrait, playerTrait, weight]
+  const pairings = [
+    [bt.likes_boobs,              pt.boobs,     3],
+    [bt.attracted_to_cheeks,      pt.cheeks,    3],
+    [bt.cares_about_body_most,    pt.body,      3],
+    [bt.feminine,                 pt.feminine,  2],
+    [bt.likes_anime,              pt.anime,     2],
+    [bt.cinephile,                pt.movies,    2],
+    [bt.likes_books,              pt.books,     2],
+    [bt.gamer,                    pt.gamer,     2],
+    [bt.addicted_to_social_media, pt.social,    1],
+    [bt.football_guy,             pt.sports,    2],
+    [bt.volleyball_guy,           pt.volleyball,2],
+    [bt.cares_about_personality,  pt.charm,     2],
+    [bt.sigma,                    pt.sigma,     1],
+    [bt.delulu,                   pt.delulu,    1],
+  ];
+
+  for (const [boyVal, playerVal, weight] of pairings) {
+    // Proximity match: closer values = higher contribution
+    const diff = Math.abs(boyVal - playerVal);
+    const match = Math.max(0, 10 - diff);
+    score += match * weight;
+    total += 10 * weight;
+  }
+
+  // shy boys are harder regardless
+  const shyPenalty = bt.shy * 2;
+  total += shyPenalty * 2;
+  score += Math.max(0, shyPenalty * 2 - bt.shy * (10 - pt.bold) * 0.4);
+
+  return Math.round((score / total) * 100);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  SCENE SCRIPTS
+//  Each boy has a list of scenes. Each scene has:
+//    narrative, boyLine, emotion, choices[]
+//  Each choice has: text, rizzDelta, condition (optional), nextEmotion, response
+// ══════════════════════════════════════════════════════════════════════════════
+function getScenes(boyId) {
+  const f = gameState.fidelity[boyId];
+  const bt = BOY_TRAITS[boyId];
+  const pt = player.traits;
+
+  const scenes = {
+
+    // ─────────────────────────────────────────────
+    aziz: [
+      {
+        narrative: "The school library. Aziz sits alone with a stack of books, looking absolutely unapproachable.",
+        boyLine: "...",
+        emotion: 'listening',
+        choices: [
+          {
+            text: "Sit next to him and open a random book upside down.",
+            rizzDelta: pt.charm >= 7 ? 4 : 2,
+            nextEmotion: 'happy',
+            response: "He glances over. A barely visible smile. He wordlessly flips your book right-side up. Progress."
+          },
+          {
+            text: "\"Hey, you went to the Uzbekistan vs Brazil match last week?\"",
+            rizzDelta: pt.sports >= 6 ? 2 : -2,
+            nextEmotion: pt.sports >= 6 ? 'happy' : 'angry',
+            response: pt.sports >= 6
+              ? "His eyes light up for exactly 0.3 seconds. \"You watch football?\" He tries to hide the excitement. He fails."
+              : "\"The score was 0-3.\" He goes back to his book. You've lost him already."
+          },
+          {
+            text: "Sneeze loudly and pretend nothing happened.",
+            rizzDelta: -3,
+            nextEmotion: 'angry',
+            response: "He shuffles his chair two inches away from you. The sigma has spoken."
+          }
+        ]
+      },
+      {
+        narrative: "A week later. Aziz is scrolling through his phone in the hallway, deeply distracted.",
+        boyLine: "Hmm.",
+        emotion: 'listening',
+        choices: [
+          {
+            text: "\"Is that a football highlight? Because I saw that goal live.\"",
+            rizzDelta: pt.sports >= 7 ? 4 : 1,
+            nextEmotion: pt.sports >= 7 ? 'happy' : 'listening',
+            response: pt.sports >= 7
+              ? "He shows you the screen. It is, in fact, a football highlight. You have unlocked level 2 of Aziz."
+              : "\"It's just a meme.\" He pockets his phone. Opportunity wasted."
+          },
+          {
+            text: "Lean over and peek at his screen from uncomfortably close.",
+            rizzDelta: pt.bold >= 8 ? 2 : -4,
+            nextEmotion: pt.bold >= 8 ? 'sad' : 'angry',
+            response: pt.bold >= 8
+              ? "He freezes. His shy system is overloading. You can see him calculating an exit strategy that he never executes."
+              : "\"Can I help you?\" The politeness is ice cold. You have violated the sigma perimeter."
+          },
+          {
+            text: "\"Have you read anything good lately?\"",
+            rizzDelta: pt.books >= 6 ? 3 : 1,
+            nextEmotion: 'happy',
+            response: "He puts the phone down. That's a first. \"Actually, yes.\""
+          }
+        ]
+      },
+      {
+        narrative: "The cafeteria. Aziz is eating alone. He's staring at nothing. He does that a lot.",
+        boyLine: "You again.",
+        emotion: 'listening',
+        choices: [
+          {
+            text: "\"You say that like it's a bad thing.\" Sit down without being invited.",
+            rizzDelta: pt.bold >= 7 ? 4 : -2,
+            nextEmotion: pt.bold >= 7 ? 'happy' : 'angry',
+            response: pt.bold >= 7
+              ? "He doesn't leave. That's Aziz-language for 'I enjoy your company.'"
+              : "He eats faster. He is speedrunning this lunch to escape."
+          },
+          {
+            text: "Show him your boobs are present by adjusting your outfit casually.",
+            rizzDelta: pt.boobs >= 7 ? 2 : -3,
+            nextEmotion: pt.boobs >= 7 ? 'sad' : 'listening',
+            response: pt.boobs >= 7
+              ? "He looks. He looks away. He looks back. He is at war with himself."
+              : "He notices nothing. He is too busy being sigma-coded."
+          },
+          {
+            text: "\"Do you ever talk to anyone or is this a permanent vibe?\"",
+            rizzDelta: pt.charm >= 6 ? 3 : -2,
+            nextEmotion: 'sad',
+            response: "\"I talk.\" Long pause. \"Sometimes.\" You've accidentally accessed his feelings."
+          }
+        ]
+      },
+      {
+        narrative: "A football match is on TV in the common room. Aziz is watching intensely.",
+        boyLine: "...",
+        emotion: 'happy',
+        choices: [
+          {
+            text: "Correctly predict the next substitution before it happens.",
+            rizzDelta: pt.sports >= 8 ? 4 : -1,
+            nextEmotion: pt.sports >= 8 ? 'happy' : 'listening',
+            response: pt.sports >= 8
+              ? "He turns to look at you like you materialized from his dreams. \"How did you know that?\""
+              : "It doesn't happen. He looks at you with polite confusion."
+          },
+          {
+            text: "Cheer loudly for the wrong team by accident.",
+            rizzDelta: -4,
+            nextEmotion: 'angry',
+            response: "He presses his lips together. The disappointment is visible from space."
+          },
+          {
+            text: "Sit close enough that your arms almost touch and say nothing.",
+            rizzDelta: pt.bold >= 6 ? 3 : 1,
+            nextEmotion: 'sad',
+            response: "He doesn't move away. His jaw tightens slightly. Something is happening inside the sigma."
+          }
+        ]
+      },
+      {
+        narrative: "Late afternoon. You find Aziz re-reading a book he's clearly already read. The spine is cracked.",
+        boyLine: "It's a good book.",
+        emotion: 'happy',
+        choices: [
+          {
+            text: "\"I read it last year. The ending destroyed me.\"",
+            rizzDelta: pt.books >= 7 ? 4 : 1,
+            nextEmotion: pt.books >= 7 ? 'happy' : 'listening',
+            response: pt.books >= 7
+              ? "He closes the book slowly. \"Most people don't get the ending.\" You have passed the final boss."
+              : "\"You read it?\" Polite skepticism. He reopens the book."
+          },
+          {
+            text: "Gently take it from his hands and flip to a random page.",
+            rizzDelta: pt.bold >= 7 ? 2 : -3,
+            nextEmotion: pt.bold >= 7 ? 'sad' : 'angry',
+            response: pt.bold >= 7
+              ? "His hand brushes yours during the transfer. Neither of you mentions it."
+              : "\"That's—\" He takes it back. \"Please don't do that.\""
+          },
+          {
+            text: "\"Can I have your number so we can talk about it?\"",
+            rizzDelta: 3,
+            nextEmotion: 'sad',
+            response: "Long silence. \"...Sure.\" He types it in your phone without looking at you. His ears are red."
+          }
+        ]
+      }
+    ],
+
+    // ─────────────────────────────────────────────
+    zafar: [
+      {
+        narrative: "The gym hallway. Zafar is coming back from practice, sweaty, jersey on, absolutely knowing he looks good.",
+        boyLine: "Sup.",
+        emotion: 'talking',
+        choices: [
+          {
+            text: "\"Sup.\" (Match his energy exactly.)",
+            rizzDelta: pt.sigma >= 7 ? 4 : 1,
+            nextEmotion: 'happy',
+            response: "He looks you up and down. A slow smirk. \"I like your energy.\""
+          },
+          {
+            text: "Compliment his football skills specifically.",
+            rizzDelta: pt.sports >= 6 ? 2 : -1,
+            nextEmotion: 'happy',
+            response: "\"You were at the match?\" He stands slightly straighter. His ego is being fed. It is thriving."
+          },
+          {
+            text: "\"You smell.\" (said with a smile)",
+            rizzDelta: pt.bold >= 9 ? 3 : -4,
+            nextEmotion: pt.bold >= 9 ? 'happy' : 'angry',
+            response: pt.bold >= 9
+              ? "He laughs. Actually laughs. \"You're kinda crazy.\" That's Zafar for 'I'm interested.'"
+              : "\"Excuse me?\" The smirk is gone. You have offended the specimen."
+          }
+        ]
+      },
+      {
+        narrative: "Zafar is posting on social media for the fifth time today. He notices you notice.",
+        boyLine: "Don't judge me.",
+        emotion: 'talking',
+        choices: [
+          {
+            text: "\"I already follow you. That post from Tuesday was... something.\"",
+            rizzDelta: pt.social >= 7 ? 4 : 1,
+            nextEmotion: 'happy',
+            response: "\"You follow me?\" He grins. Of course he checks who follows him. Of course."
+          },
+          {
+            text: "Show him your own phone — you're more addicted than he is.",
+            rizzDelta: pt.social >= 8 ? 2 : -1,
+            nextEmotion: 'happy',
+            response: "He inspects your screen time stats. \"Okay you need help.\" He's impressed."
+          },
+          {
+            text: "\"Do you have an actual personality or just posts?\"",
+            rizzDelta: pt.charm >= 8 ? 1 : -4,
+            nextEmotion: 'angry',
+            response: "\"Wow.\" He stares at you. This could go either way with Zafar. His eyes narrow. He respects it a little."
+          }
+        ]
+      },
+      {
+        narrative: "A party. Zafar is in his element. You walk past him and his eyes follow.",
+        boyLine: "Hey. You look— yeah.",
+        emotion: 'horny',
+        choices: [
+          {
+            text: "Smile and keep walking. Don't stop.",
+            rizzDelta: pt.sigma >= 8 ? 4 : -2,
+            nextEmotion: 'horny',
+            response: "He follows. He doesn't know why he's following. You have unlocked the sigma trigger."
+          },
+          {
+            text: "Show off your best asset — cheeks, boobs, body, dealer's choice.",
+            rizzDelta: Math.max(pt.cheeks, pt.boobs, pt.body) >= 7 ? 3 : -1,
+            nextEmotion: 'horny',
+            response: Math.max(pt.cheeks, pt.boobs, pt.body) >= 7
+              ? "His brain momentarily stops working. You can see it."
+              : "He glances. Nods politely. You needed more firepower."
+          },
+          {
+            text: "\"You were going to say something?\"",
+            rizzDelta: pt.charm >= 7 ? 2 : -3,
+            nextEmotion: 'happy',
+            response: "\"I was.\" He smirks. \"I forgot.\" He didn't forget. He is testing you."
+          }
+        ]
+      },
+      {
+        narrative: "Film studies class. You and Zafar are paired for a project. He arrives five minutes late.",
+        boyLine: "Don't start without me.",
+        emotion: 'talking',
+        choices: [
+          {
+            text: "\"I started. I also finished. You're welcome.\"",
+            rizzDelta: pt.intel >= 7 ? 4 : -2,
+            nextEmotion: 'angry',
+            response: "\"...okay that's actually kind of fire.\" He sits down, impressed against his will."
+          },
+          {
+            text: "Suggest a film that matches his vibe perfectly.",
+            rizzDelta: pt.movies >= 7 ? 3 : 1,
+            nextEmotion: 'happy',
+            response: pt.movies >= 7
+              ? "\"How do you know that film?\" He leans forward. You have his full attention for the first time ever."
+              : "\"Sure.\" He shrugs. Missed connection."
+          },
+          {
+            text: "\"You're late AND you smell like the gym.\"",
+            rizzDelta: pt.bold >= 8 ? 2 : -4,
+            nextEmotion: pt.bold >= 8 ? 'happy' : 'angry',
+            response: pt.bold >= 8
+              ? "He smirks slowly. \"You're kinda annoying.\" He moves his chair closer."
+              : "\"Are you always like this?\" He opens his laptop, conversation over."
+          }
+        ]
+      },
+      {
+        narrative: "End of day. Zafar is alone for once. He looks almost... human.",
+        boyLine: "You're always around.",
+        emotion: 'listening',
+        choices: [
+          {
+            text: "\"You're never boring. That's your fault.\"",
+            rizzDelta: pt.charm >= 7 ? 4 : 1,
+            nextEmotion: 'happy',
+            response: "He looks at you for a long second. \"Yeah?\" That one word carries a lot."
+          },
+          {
+            text: "Ask him something genuinely personal. Not about football.",
+            rizzDelta: pt.intel >= 6 ? 2 : -2,
+            nextEmotion: 'sad',
+            response: "He pauses. He's not used to this. \"Nobody asks me that.\" He answers anyway."
+          },
+          {
+            text: "\"I like you, Zafar. Just putting that out there.\"",
+            rizzDelta: pt.bold >= 7 ? 3 : -4,
+            nextEmotion: pt.bold >= 7 ? 'horny' : 'angry',
+            response: pt.bold >= 7
+              ? "Silence. Then: \"...alright.\" He looks away. He is smiling. You win."
+              : "\"That's... cool.\" Deflect. Dodge. Escape. He is gone."
+          }
+        ]
+      }
+    ],
+
+    // ─────────────────────────────────────────────
+    hasan: [
+      {
+        narrative: "Hasan is mid-game on his phone, walking and playing simultaneously. He almost walks into you.",
+        boyLine: "Oh — sorry, I was—",
+        emotion: 'sad',
+        choices: [
+          {
+            text: "\"It's fine. What are you playing?\"",
+            rizzDelta: pt.gamer >= 6 ? 4 : 1,
+            nextEmotion: 'happy',
+            response: "His face transforms. \"You play?\" The phone is suddenly very much your business."
+          },
+          {
+            text: "Take the phone out of his hands mid-sentence.",
+            rizzDelta: pt.bold >= 7 ? 2 : -3,
+            nextEmotion: pt.bold >= 7 ? 'happy' : 'angry',
+            response: pt.bold >= 7
+              ? "\"HEY—\" He sees you laughing. \"Oh you're dead.\" He reaches for it. You have initiated flirting."
+              : "\"Please don't—\" He takes it back, visibly pained. \"I was in a match.\""
+          },
+          {
+            text: "Dramatically clutch your chest like he hit you.",
+            rizzDelta: pt.delulu >= 7 ? -1 : -4,
+            nextEmotion: 'sad',
+            response: "\"Are you okay?\" He is genuinely alarmed. You've entered his radar through chaos."
+          }
+        ]
+      },
+      {
+        narrative: "Hasan is watching football with friends. You pull up a chair.",
+        boyLine: "You watch football?",
+        emotion: 'listening',
+        choices: [
+          {
+            text: "\"Every weekend. My team's better than yours though.\"",
+            rizzDelta: pt.sports >= 7 ? 4 : -2,
+            nextEmotion: 'angry',
+            response: pt.sports >= 7
+              ? "\"Oh you did NOT just say that.\" He turns fully to face you. The banter has begun."
+              : "\"What team?\" You answer. He pulls a face. \"Mm.\" Brutal."
+          },
+          {
+            text: "Scream at the TV at exactly the right moment.",
+            rizzDelta: pt.sports >= 8 ? 2 : -3,
+            nextEmotion: pt.sports >= 8 ? 'happy' : 'sad',
+            response: pt.sports >= 8
+              ? "He screams too. You're both screaming. His friends exchange a look. Something is happening."
+              : "Everyone stares at you. Wrong moment. You were a beat too late."
+          },
+          {
+            text: "\"I'm more of a volleyball person actually.\"",
+            rizzDelta: pt.volleyball >= 7 ? 2 : -1,
+            nextEmotion: 'listening',
+            response: "He nods slowly. Not his sport but he respects it. Small win."
+          }
+        ]
+      },
+      {
+        narrative: "Hasan is posting a meme to his story. He shows you before posting.",
+        boyLine: "Funny or cringe?",
+        emotion: 'talking',
+        choices: [
+          {
+            text: "\"Both. That's what makes it good. Post it.\"",
+            rizzDelta: pt.social >= 7 ? 4 : 2,
+            nextEmotion: 'happy',
+            response: "He posts it immediately. \"I knew it.\" He shows you the replies as they come in. You are now his consultant."
+          },
+          {
+            text: "Take his phone and edit the caption before he can stop you.",
+            rizzDelta: pt.charm >= 7 ? 3 : -3,
+            nextEmotion: pt.charm >= 7 ? 'happy' : 'angry',
+            response: pt.charm >= 7
+              ? "Your version gets more likes. He refuses to admit this is better. He is following your account now."
+              : "\"Give it—\" He retrieves it. \"Don't touch my phone.\""
+          },
+          {
+            text: "\"Cringe. But YOUR cringe so it's endearing.\"",
+            rizzDelta: pt.charm >= 8 ? 2 : -2,
+            nextEmotion: 'sad',
+            response: "He looks at you sideways. \"Your cringe?\" He's replaying that sentence."
+          }
+        ]
+      },
+      {
+        narrative: "You run into Hasan at the cinema. He's alone. You're alone.",
+        boyLine: "You're seeing this too?",
+        emotion: 'happy',
+        choices: [
+          {
+            text: "\"Guess we're watching it together.\" Sit next to him without asking.",
+            rizzDelta: pt.bold >= 7 ? 4 : -2,
+            nextEmotion: 'happy',
+            response: pt.bold >= 7
+              ? "He laughs. \"Alright then.\" He does not buy separate popcorn. He shares his."
+              : "\"Oh.\" He scoots over politely. Friendly, not romantic. You needed more boldness."
+          },
+          {
+            text: "Spend the whole film whispering commentary to him.",
+            rizzDelta: pt.movies >= 7 ? 3 : 1,
+            nextEmotion: 'happy',
+            response: pt.movies >= 7
+              ? "He whispers back. By the end you've both missed half the plot and don't care."
+              : "He shushes you once. Kindly, but still."
+          },
+          {
+            text: "During the scary part, grab his arm.",
+            rizzDelta: pt.cheeks >= 7 ? 2 : -3,
+            nextEmotion: 'sad',
+            response: "He doesn't shake you off. He doesn't move at all. He is very aware of your hand."
+          }
+        ]
+      },
+      {
+        narrative: "End of a long day. Hasan texts you a meme out of nowhere. First contact initiated by him.",
+        boyLine: "(sends meme with zero context)",
+        emotion: 'happy',
+        choices: [
+          {
+            text: "Reply with a better meme. No words.",
+            rizzDelta: pt.social >= 8 ? 4 : 1,
+            nextEmotion: 'happy',
+            response: "He responds instantly. Then another meme. This continues for two hours. Something has shifted."
+          },
+          {
+            text: "\"Did you just... text me first?\" with three 👀 emojis.",
+            rizzDelta: pt.charm >= 7 ? 2 : -2,
+            nextEmotion: 'sad',
+            response: "\"Shut up.\" He sends three more memes in rapid succession. He is embarrassed. It's adorable."
+          },
+          {
+            text: "Call him instead of texting back.",
+            rizzDelta: pt.bold >= 8 ? 3 : -4,
+            nextEmotion: pt.bold >= 8 ? 'happy' : 'sad',
+            response: pt.bold >= 8
+              ? "He picks up. Pause. \"...hello?\" His voice is softer on the phone. You talk for an hour."
+              : "He doesn't pick up. He texts back: \"bro why are you calling.\""
+          }
+        ]
+      }
+    ],
+
+    // ─────────────────────────────────────────────
+    islom: [
+      {
+        narrative: "Volleyball court. Islom scores a point and immediately looks into the stands. He was looking for an audience. He finds you.",
+        boyLine: "Hey! Did you see that?!",
+        emotion: 'happy',
+        choices: [
+          {
+            text: "Stand up and clap. Make it obvious.",
+            rizzDelta: pt.volleyball >= 6 ? 4 : 2,
+            nextEmotion: 'happy',
+            response: "He grins so wide it's almost painful. He points at you during the next point. You are now his designated cheerleader."
+          },
+          {
+            text: "Thumbs up. Cool. Measured. Unbothered.",
+            rizzDelta: pt.sigma >= 7 ? 2 : -1,
+            nextEmotion: 'happy',
+            response: "The thumbs up is enough for Islom. He does a little celebration dance that he will regret later."
+          },
+          {
+            text: "\"I've seen better.\" (you haven't)",
+            rizzDelta: pt.bold >= 6 ? 3 : -3,
+            nextEmotion: pt.bold >= 6 ? 'happy' : 'sad',
+            response: pt.bold >= 6
+              ? "He narrows his eyes. \"Oh yeah?\" He proceeds to score three consecutive points while maintaining eye contact with you."
+              : "His face falls. He tries to recover. He does a slightly worse play next. You hurt him."
+          }
+        ]
+      },
+      {
+        narrative: "Islom appears at your locker with a book. Your book. That you left on a bench three days ago.",
+        boyLine: "I've been carrying this around since Tuesday trying to find you.",
+        emotion: 'sad',
+        choices: [
+          {
+            text: "\"You kept it for three days?\" Look touched.",
+            rizzDelta: 4,
+            nextEmotion: 'happy',
+            response: "\"I didn't want it to get damaged.\" He hands it over. His cheeks are slightly pink. He is unaware of this."
+          },
+          {
+            text: "\"Have you read it?\"",
+            rizzDelta: pt.books >= 6 ? 2 : -1,
+            nextEmotion: 'sad',
+            response: "\"I... may have read the first chapter.\" He looks guilty. He read three chapters."
+          },
+          {
+            text: "Hug him impulsively for returning it.",
+            rizzDelta: pt.cheeks >= 7 ? 3 : -3,
+            nextEmotion: pt.cheeks >= 7 ? 'happy' : 'sad',
+            response: "He stands very still for exactly one second, then carefully puts his arms around you. This is the best day of his life."
+          }
+        ]
+      },
+      {
+        narrative: "Islom sends you a message asking if you want to watch a film together this weekend. He sent it. Deleted it. Resent it. You saw the whole thing.",
+        boyLine: "(edited): would you maybe want to— ignore this if it's weird",
+        emotion: 'sad',
+        choices: [
+          {
+            text: "\"It's not weird. Yes.\" Send immediately.",
+            rizzDelta: 4,
+            nextEmotion: 'happy',
+            response: "Fifteen seconds of typing. \"Cool!! I mean — cool.\" He put two exclamation marks and panicked. He is perfect."
+          },
+          {
+            text: "\"You deleted it and resent it. I saw everything.\"",
+            rizzDelta: pt.charm >= 7 ? 2 : -3,
+            nextEmotion: pt.charm >= 7 ? 'happy' : 'sad',
+            response: pt.charm >= 7
+              ? "\"NO I DIDN'T.\" He definitely did. You're both laughing now through text. The date is confirmed."
+              : "\"...oh no.\" Long silence. \"I'm going to change schools.\""
+          },
+          {
+            text: "Leave him on read for two hours then say yes.",
+            rizzDelta: pt.sigma >= 8 ? 1 : -4,
+            nextEmotion: pt.sigma >= 8 ? 'sad' : 'sad',
+            response: pt.sigma >= 8
+              ? "\"I thought you weren't going to answer.\" His relief is audible through text. You have power here."
+              : "He sends a follow-up: \"sorry that was so awkward forget I said anything\". You've broken him."
+          }
+        ]
+      },
+      {
+        narrative: "The film date. Islom arrived early and got snacks for both of you based on zero information about your preferences. He guessed.",
+        boyLine: "I didn't know what you liked so I got... all of it.",
+        emotion: 'sad',
+        choices: [
+          {
+            text: "\"Everything I wanted is here. How did you know?\"",
+            rizzDelta: 4,
+            nextEmotion: 'happy',
+            response: "He visibly exhales. \"Fifty fifty chance.\" It was not fifty fifty. He researched this."
+          },
+          {
+            text: "Pick something he got wrong on purpose and tease him.",
+            rizzDelta: pt.charm >= 6 ? 2 : -3,
+            nextEmotion: pt.charm >= 6 ? 'sad' : 'sad',
+            response: pt.charm >= 6
+              ? "\"I KNEW IT I should have— okay I'm going back to the—\" He stands up. You grab his arm. \"I'm joking, sit down.\""
+              : "He genuinely panics and offers to go exchange it. He is already halfway out of his seat."
+          },
+          {
+            text: "Sit close enough that your shoulders touch. Say nothing about the snacks.",
+            rizzDelta: pt.cheeks >= 8 ? 3 : -1,
+            nextEmotion: pt.cheeks >= 8 ? 'happy' : 'sad',
+            response: "He looks at the point where your shoulders are touching. He looks at the screen. He does not move. Not even once. Not for two hours."
+          }
+        ]
+      },
+      {
+        narrative: "Walking home. Islom is clearly stalling. He's talked about volleyball, books, the film, the weather, other films, and volleyball again.",
+        boyLine: "I'm just saying, it's a really underrated sport—",
+        emotion: 'talking',
+        choices: [
+          {
+            text: "\"Islom. Do you like me or do you like volleyball?\"",
+            rizzDelta: pt.bold >= 6 ? 4 : -4,
+            nextEmotion: pt.bold >= 6 ? 'happy' : 'sad',
+            response: pt.bold >= 6
+              ? "Complete silence. \"...Both.\" He is looking at the ground. \"But you more.\" VICTORY."
+              : "\"I — what? I was just — the sport has a lot of—\" He word-vomits for another three minutes and leaves."
+          },
+          {
+            text: "Stop walking. Make him notice.",
+            rizzDelta: pt.charm >= 7 ? 3 : -2,
+            nextEmotion: pt.charm >= 7 ? 'happy' : 'sad',
+            response: pt.charm >= 7
+              ? "He stops mid-sentence. Turns around. Sees you standing there smiling at him. He walks back slowly. \"What?\""
+              : "He keeps talking for four steps before realizing. \"Oh — sorry, are you tired? We can—\""
+          },
+          {
+            text: "\"I had a really good time today.\"",
+            rizzDelta: 2,
+            nextEmotion: 'happy',
+            response: "\"Yeah?\" He's trying not to smile. He completely fails. \"Me too.\" Simple. Perfect."
+          }
+        ]
+      }
+    ]
+  };
+
+  return scenes[boyId] || [];
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateVal(slider) {
+  const key = slider.id.replace('t_', 'v_');
+  document.getElementById(key).textContent = slider.value;
+}
+
+function showToast(msg, type = 'neutral') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function addDialogue(speaker, text, isPlayer = false, color = null) {
+  const area = document.getElementById('dialogue-area');
+  const bubble = document.createElement('div');
+  bubble.className = 'dialogue-bubble ' + (isPlayer ? 'player' : 'boy');
+
+  const speakerEl = document.createElement('div');
+  speakerEl.className = 'bubble-speaker';
+  speakerEl.textContent = speaker;
+  if (color) speakerEl.style.color = color;
+
+  const textEl = document.createElement('div');
+  textEl.className = 'bubble-text';
+  if (color && !isPlayer) textEl.style.color = color;
+  textEl.textContent = text;
+
+  bubble.appendChild(speakerEl);
+  bubble.appendChild(textEl);
+  area.appendChild(bubble);
+  area.scrollTop = area.scrollHeight;
+}
+
+function addNarrative(text) {
+  const area = document.getElementById('dialogue-area');
+  const el = document.createElement('div');
+  el.className = 'narrative-text';
+  el.textContent = text;
+  area.appendChild(el);
+  area.scrollTop = area.scrollHeight;
+}
+
+function setSprite(boyId, emotion) {
+  const img = document.getElementById('game-sprite-img');
+  const emoji = document.getElementById('game-sprite-emoji');
+  const badge = document.getElementById('emotion-badge');
+
+  img.src = `${boyId}_${emotion}.png`;
+  img.style.display = 'block';
+  emoji.style.display = 'none';
+
+  badge.textContent = emotion.toUpperCase();
+  gameState.currentEmotion = emotion;
+}
+
+function updateRizzBar(boyId) {
+  const score  = gameState.rizzScores[boyId];
+  const maxR   = RIZZ_MAX[boyId];
+  const pct    = Math.min(100, (score / maxR) * 100);
+  document.getElementById('rizz-bar-fill').style.width = pct + '%';
+  document.getElementById('rizz-score-display').textContent = score + ' / ' + RIZZ_WIN_THRESHOLD[boyId];
+}
+
+function renderChoices(choices, boyId) {
+  const area = document.getElementById('choices-area');
+  area.innerHTML = '';
+
+  choices.forEach((choice, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = choice.text;
+    btn.onclick = () => handleChoice(choice, boyId);
+    area.appendChild(btn);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  GAME FLOW
+// ══════════════════════════════════════════════════════════════════════════════
+function createCharacter() {
+  const nameInput = document.getElementById('player-name-input').value.trim();
+  if (!nameInput) {
+    showToast('Give your girl a name first!', 'negative');
+    return;
+  }
+
+  player.name = nameInput;
+  player.traits = {
+    boobs:     parseInt(document.getElementById('t_boobs').value),
+    cheeks:    parseInt(document.getElementById('t_cheeks').value),
+    body:      parseInt(document.getElementById('t_body').value),
+    feminine:  parseInt(document.getElementById('t_feminine').value),
+    anime:     parseInt(document.getElementById('t_anime').value),
+    movies:    parseInt(document.getElementById('t_movies').value),
+    books:     parseInt(document.getElementById('t_books').value),
+    gamer:     parseInt(document.getElementById('t_gamer').value),
+    social:    parseInt(document.getElementById('t_social').value),
+    sports:    parseInt(document.getElementById('t_sports').value),
+    volleyball:parseInt(document.getElementById('t_volleyball').value),
+    bold:      parseInt(document.getElementById('t_bold').value),
+    intel:     parseInt(document.getElementById('t_intel').value),
+    charm:     parseInt(document.getElementById('t_charm').value),
+    sigma:     parseInt(document.getElementById('t_sigma').value),
+    delulu:    parseInt(document.getElementById('t_delulu').value),
+  };
+
+  // Calculate fidelity for all boys
+  ['aziz','zafar','hasan','islom'].forEach(id => {
+    const f = calculateFidelity(id);
+    gameState.fidelity[id] = f;
+  });
+
+  document.getElementById('select-player-name').textContent = 'Playing as: ' + player.name;
+
+  // Update select screen fidelity displays
+  ['aziz','zafar','hasan','islom'].forEach(id => {
+    const f = gameState.fidelity[id];
+    document.getElementById('fidelity-bar-' + id).style.width = f + '%';
+    document.getElementById('fidelity-label-' + id).textContent = f + '% FIDELITY';
+  });
+
+  showScreen('screen-select');
+}
+
+function startRoute(boyId) {
+  gameState.currentBoy   = boyId;
+  gameState.currentScene = 0;
+  gameState.rizzScores[boyId] = 0;
+
+  // Style game screen for this boy
+  const color = BOY_COLORS[boyId];
+  document.getElementById('game-boy-name').textContent = BOY_NAMES[boyId];
+  document.getElementById('game-boy-name').style.color = color;
+  document.getElementById('rizz-bar-fill').style.background =
+    `linear-gradient(90deg, ${color}, var(--accent2))`;
+
+  // Clear dialogue
+  document.getElementById('dialogue-area').innerHTML = '';
+  document.getElementById('choices-area').innerHTML  = '';
+
+  updateRizzBar(boyId);
+  showScreen('screen-game');
+
+  // Small delay then start first scene
+  setTimeout(() => runScene(boyId), 300);
+}
+
+function runScene(boyId) {
+  const scenes = getScenes(boyId);
+
+  if (gameState.currentScene >= scenes.length) {
+    // All scenes done — check win/lose
+    endRoute(boyId);
+    return;
+  }
+
+  const scene = scenes[gameState.currentScene];
+
+  // Narrative
+  addNarrative(scene.narrative);
+
+  // Set sprite
+  setSprite(boyId, scene.emotion);
+
+  // Boy line
+  setTimeout(() => {
+    if (scene.boyLine && scene.boyLine !== '...') {
+      addDialogue(BOY_NAMES[boyId], scene.boyLine, false, BOY_COLORS[boyId]);
+    }
+    // Render choices
+    setTimeout(() => renderChoices(scene.choices, boyId), 400);
+  }, 500);
+}
+
+function handleChoice(choice, boyId) {
+  // Show player's choice
+  addDialogue(player.name, choice.text, true);
+
+  // Apply rizz delta (fidelity gives a bonus multiplier)
+  const fidelityBonus = 1 + (gameState.fidelity[boyId] / 200);
+  const rawDelta = choice.rizzDelta;
+  const finalDelta = rawDelta > 0
+    ? Math.round(rawDelta * fidelityBonus)
+    : rawDelta; // penalties are not reduced by fidelity
+
+  gameState.rizzScores[boyId] = Math.max(0, gameState.rizzScores[boyId] + finalDelta);
+  updateRizzBar(boyId);
+
+  // Toast feedback — show result and current score total
+  const newScore = gameState.rizzScores[boyId];
+  if (finalDelta > 0) {
+    showToast(`💗 RIZZ UP — ${newScore} / ${RIZZ_WIN_THRESHOLD[boyId]} needed`, 'positive');
+  } else if (finalDelta < 0) {
+    showToast(`💀 RIZZ DOWN — ${newScore} / ${RIZZ_WIN_THRESHOLD[boyId]} needed`, 'negative');
+  } else {
+    showToast(`😐 NO CHANGE — ${newScore} / ${RIZZ_WIN_THRESHOLD[boyId]} needed`, 'neutral');
+  }
+
+  // Set emotion
+  setSprite(boyId, choice.nextEmotion);
+
+  // Show response as narrative after small delay
+  setTimeout(() => {
+    addNarrative(choice.response);
+    document.getElementById('choices-area').innerHTML = '';
+
+    // Next scene after reading delay
+    setTimeout(() => {
+      gameState.currentScene++;
+      runScene(boyId);
+    }, 2200);
+  }, 600);
+}
+
+function endRoute(boyId) {
+  const score     = gameState.rizzScores[boyId];
+  const threshold = RIZZ_WIN_THRESHOLD[boyId];
+  const maxScore  = RIZZ_MAX[boyId];
+  const fidelity  = gameState.fidelity[boyId];
+  const won       = score >= threshold;
+  const color     = BOY_COLORS[boyId];
+
+  const endBg = document.getElementById('ending-bg');
+
+  if (won) {
+    endBg.style.background = `radial-gradient(ellipse at 50% 50%, ${color}22, transparent 70%)`;
+    document.getElementById('ending-emoji').textContent = '💗';
+    document.getElementById('ending-title').textContent = 'YOU RIZZED HIM UP';
+    document.getElementById('ending-title').style.color = color;
+    document.getElementById('ending-score').textContent =
+      `FINAL RIZZ: ${score} / ${threshold} NEEDED — FIDELITY: ${fidelity}%`;
+
+    const msgs = {
+      aziz:  `${player.name} conquered the unconquerable. Aziz, master of the sigma stare and football statistics, has been successfully rizzed. He will never admit this to his friends but he has already saved your contact under a very normal name that is definitely not a heart emoji.`,
+      zafar: `${player.name} cracked the code on Zafar's carefully constructed cool-guy exterior. He's already posting a very casual, non-suspicious story at your location. Classic Zafar.`,
+      hasan: `${player.name} passed all of Hasan's unspoken vibe checks. He has already shown you seventeen memes today. This is his love language. Cherish it.`,
+      islom: `${player.name} said yes to the most delulu, volleyball-obsessed, secretly soft sigma who ever existed. He has already told his mom. He told her the day you spoke for the first time.`,
+    };
+    document.getElementById('ending-msg').textContent = msgs[boyId];
+  } else {
+    endBg.style.background = 'radial-gradient(ellipse at 50% 50%, rgba(239,68,68,0.1), transparent 70%)';
+    document.getElementById('ending-emoji').textContent = '💔';
+    document.getElementById('ending-title').textContent = 'L + RATIO';
+    document.getElementById('ending-title').style.color = '#ef4444';
+    document.getElementById('ending-score').textContent =
+      `FINAL RIZZ: ${score} / ${threshold} NEEDED — FIDELITY: ${fidelity}%`;
+
+    const loseMsgs = {
+      aziz:  `Aziz has returned to his natural state: reading, watching football, and not thinking about you. Almost. He thought about you once and then read an extra chapter to compensate.`,
+      zafar: `Zafar ghosted you so professionally it was almost impressive. His social media remains unaffected. You are a closed chapter. He has already opened a new one.`,
+      hasan: `Hasan sent you a meme two days later with no context. This is either an olive branch or he completely forgot anything happened. With Hasan, impossible to know.`,
+      islom: `Islom is fine. He cried about it in the car for eleven minutes and then went to volleyball practice and scored four points and felt better.`,
+    };
+    document.getElementById('ending-msg').textContent = loseMsgs[boyId];
+  }
+
+  showScreen('screen-ending');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  INIT — animate fidelity bars on load if player exists
+// ══════════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Pre-set slider display values
+  document.querySelectorAll('.trait-slider').forEach(s => {
+    const key = s.id.replace('t_', 'v_');
+    const el = document.getElementById(key);
+    if (el) el.textContent = s.value;
+  });
+});
+</script>
+</body>
+</html>
